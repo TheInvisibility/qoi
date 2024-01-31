@@ -1,60 +1,57 @@
 #include <iostream>
 #include <fstream>
+#include "qoi.h"
 
-#define clearChain for(int i = 0; i<height*width; i++){delete[] chain[i];} delete[] chain;
+#define clearChain for(int i = 0; i<header.height*header.width; i++){delete[] chain[i];} delete[] chain;
 
 using namespace std;
 
+unsigned readNum(ifstream& file)
+{
+    unsigned num;
+    char c;
+    num = 0;
+    file.read(&c, 1);
+    do {
+        num *= 10;
+        num += c - '0';
+        file.read(&c, 1);
+    }
+    while (c >= '0' && c <= '9');
+
+    return num;
+}
+
 char** chain;
-unsigned long long height, width;
-char magicNum[4];
-unsigned encodedPixelSize;
+QOI::header header;
+
+
 
 void load_ppm(const string& path)
 {
+    // init header
+    header.magic; //???????
+    header.channels = 3u;
+    header.colorspace = 0u;
 
     ifstream file(path, ios::binary | ios::in);
 
-
-
-    //load height and width
+    //load magic num, height, width and encoded pixel size
+    char magicNum[4];
     file.read(magicNum, 3); // 3 = sizeof ("P6\n")
 
-    char c;
+    header.width = readNum(file);
 
-    width = 0;
-    file.read(&c, 1);
-    do
-    {
-        width *= 10;
-        width += c-'0';
-        file.read(&c, 1);
-    }while (c!=' ');
+    header.height = readNum(file);
 
-    height = 0;
-    file.read(&c, 1);
-    do
-    {
-        height *= 10;
-        height += c-'0';
-        file.read(&c, 1);
-    }while (c!='\n');
-
-
-    encodedPixelSize = 0;
-    file.read(&c, 1);
-    do
-    {
-        encodedPixelSize *= 10;
-        encodedPixelSize += c-'0';
-        file.read(&c, 1);
-    }while (c!='\n');
+    unsigned encodedPixelSize;
+    encodedPixelSize = readNum(file);
 
     // resize chain
-    chain = new char* [height * width];
+    chain = new char* [header.height * header.width];
 
     // fill chain
-    for (unsigned long long index = 0; index < height * width; index++)
+    for (unsigned long long index = 0; index < header.height * header.width; index++)
     {
         chain[index] = new char[3];
 
@@ -78,17 +75,17 @@ unsigned get_index(const char* ptr)
 
     unsigned sum = (unsigned char)(ptr[0]) + (unsigned char)(ptr[1]) + (unsigned char)(ptr[2]);
 
-    return sum / 96; // 96 = 3*(255/
+    return sum / 96;
 }
 
 
 void display_chain()
 {
-    for (unsigned long long i = 0; i< height; i+=3)
+    for (unsigned long long i = 0; i< header.height; i+=3)
     {
-        for (unsigned long long j = 0; j< width; j++)
+        for (unsigned long long j = 0; j< header.width; j++)
         {
-            cout << palette[get_index(chain[j + width * i])];
+            cout << palette[get_index(chain[j + header.width * i])];
         }
         cout << endl;
     }
@@ -99,11 +96,11 @@ void write_chain(string path)
 {
     ofstream file(path);
 
-    for (unsigned long long i = 0; i< height; i+=3)
+    for (unsigned long long i = 0; i< header.height; i+=3)
     {
-        for (unsigned long long j = 0; j< width; j++)
+        for (unsigned long long j = 0; j< header.width; j++)
         {
-            file << palette[get_index(chain[j + width * i])];
+            file << palette[get_index(chain[j + header.width * i])];
         }
         file << '\n';
     }
