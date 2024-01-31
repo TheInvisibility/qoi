@@ -20,6 +20,8 @@ void load_ppm(string path)
 
     ascii_text >> magic_num >> height >> width;
 
+    ascii_text.close();
+
 // resize chain
     chain = new char* [height * width];
 
@@ -55,8 +57,7 @@ unsigned get_index(char* ptr)
 
 int main()
 {
-    load_ppm("test.ppm");
-
+    load_ppm("moreboxes_2.ppm");
 
     ofstream file("test.bin", ios::binary | ios::out);
 
