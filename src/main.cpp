@@ -23,7 +23,7 @@ unsigned readNum(ifstream& file)
 }
 
 char** chain;
-QOI::header header;
+QOI::Header header;
 
 
 
@@ -116,6 +116,10 @@ int main()
 
     //display_chain();
     write_chain("images/img.txt");
+
+
+
+    QOI::Write("file.qoi", header, chain);
 
     clearChain
     return 0;

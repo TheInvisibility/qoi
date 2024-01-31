@@ -21,7 +21,7 @@ namespace QOI {
 
 
 
-    struct header {
+    struct Header {
         char magic[4] ; // octets de magie "qoif".
         u32 width ; // largeur de l'image en pixels (BE)
         u32 height ; // hauteur de l'image en pixels (BE)
@@ -31,7 +31,10 @@ namespace QOI {
 
         void Read(std::ifstream file);
         void Write(std::ofstream file);
-    } ;
+    };
+
+
+    void Write(char* path, Header& header, char** chain);
 }
 
 #endif
