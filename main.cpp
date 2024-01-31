@@ -13,9 +13,12 @@ void load_ppm(string path)
 {
     ifstream file(path, ios::binary | ios::in);
 
-// load height and width
-height = file.read();
-width = 640;
+    //load height and width
+    ifstream ascii_text; ascii_text.open(path);
+
+    string magic_num;
+
+    ascii_text >> magic_num >> height >> width;
 
 // resize chain
     chain = new char* [height * width];
