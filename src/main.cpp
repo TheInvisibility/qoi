@@ -4,6 +4,8 @@
 
 #define clearChain for(int i = 0; i<header.height*header.width; i++){delete[] chain[i];} delete[] chain;
 
+
+
 using namespace std;
 
 unsigned readNum(ifstream& file)

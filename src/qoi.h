@@ -8,8 +8,8 @@
 #define u8 unsigned char
 
 namespace QOI {
-    const u32 magic = 0x66696f71; // octets de magie "qoif".
-    const u64 eof = 0x8000000000000000; //8 bytes de fin
+    const u32 magic = 0x716f6966 ; // octets de magie "qoif".
+    const u64 eof = 0x0000000000000001;//8 bytes de fin
 
     namespace flag8bit {
         const char rgb = 0b11111110;
