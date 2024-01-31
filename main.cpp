@@ -1,31 +1,53 @@
 #include <iostream>
 #include <fstream>
 
-
-#define clearChaine
+#define clearChain for(int i = 0; i<height*width; i++){delete[] chain[i];} delete[] chain;
 
 using namespace std;
 
 char** chain;
 unsigned long long height, width;
+char magicNum[4];
 
 void load_ppm(string path)
 {
+
     ifstream file(path, ios::binary | ios::in);
 
+
+
     //load height and width
-    ifstream ascii_text; ascii_text.open(path);
+    file.read(magicNum, 3); // 4 = sizeof ("P16\n")
 
-    string magic_num;
 
-    ascii_text >> magic_num >> height >> width;
 
-    ascii_text.close();
+    char c;
+    height = 0;
+    file.read(&c, 1);
+    do
+    {
+        height *= 10;
+        height += c-'0';
+        file.read(&c, 1);
+    }while (c!=' ');
 
-// resize chain
+
+    width = 0;
+    file.read(&c, 1);
+    do
+    {
+        width *= 10;
+        width += c-'0';
+        file.read(&c, 1);
+    }while (c!='\n');
+
+    cout << "height > " << height << endl;
+    cout << "width > " << width;
+
+    // resize chain
     chain = new char* [height * width];
 
-// fill chain
+    // fill chain
     for (unsigned long long index = 0; index < height * width; index++)
     {
         chain[index] = new char[3];
@@ -37,20 +59,19 @@ void load_ppm(string path)
     }
 
     file.close();
+
 }
 
 
 
-const char palette[8] = { ' ', '.', ',', '*', '/', '%', '@' };
+const char palette[8] = { ' ', '.', ':', '*', '/', '%', '@' };
 
 
 unsigned get_index(char* ptr)
 {
 
-    unsigned sum = (unsigned)ptr[0] + (unsigned)ptr[1] + (unsigned)ptr[2];
+    unsigned sum = (unsigned char)(ptr[0]) + (unsigned char)(ptr[1]) + (unsigned char)(ptr[2]);
 
-    if (sum/96 > 4473)
-        sum = 255;
     return sum / 96;
 }
 
@@ -73,5 +94,7 @@ int main()
 
     file.close();
 
+
+    clearChain
     return 0;
 }
