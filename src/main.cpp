@@ -30,7 +30,6 @@ QOI::Header header;
 void load_ppm(const string& path)
 {
     // init header
-    header.magic; //???????
     header.channels = 3u;
     header.colorspace = 0u;
 
@@ -55,9 +54,7 @@ void load_ppm(const string& path)
     {
         chain[index] = new char[3];
 
-        file.read((char*)&chain[index][0], 1);
-        file.read((char*)&chain[index][1], 1);
-        file.read((char*)&chain[index][2], 1);
+        file.read(chain[index], 3);
 
     }
 
