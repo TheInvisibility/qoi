@@ -8,8 +8,9 @@ using namespace std;
 char** chain;
 unsigned long long height, width;
 char magicNum[4];
+unsigned encodedPixelSize;
 
-void load_ppm(string path)
+void load_ppm(const string& path)
 {
 
     ifstream file(path, ios::binary | ios::in);
@@ -19,18 +20,7 @@ void load_ppm(string path)
     //load height and width
     file.read(magicNum, 3); // 3 = sizeof ("P6\n")
 
-
-
     char c;
-    height = 0;
-    file.read(&c, 1);
-    do
-    {
-        height *= 10;
-        height += c-'0';
-        file.read(&c, 1);
-    }while (c!=' ');
-
 
     width = 0;
     file.read(&c, 1);
@@ -38,6 +28,25 @@ void load_ppm(string path)
     {
         width *= 10;
         width += c-'0';
+        file.read(&c, 1);
+    }while (c!=' ');
+
+    height = 0;
+    file.read(&c, 1);
+    do
+    {
+        height *= 10;
+        height += c-'0';
+        file.read(&c, 1);
+    }while (c!='\n');
+
+
+    encodedPixelSize = 0;
+    file.read(&c, 1);
+    do
+    {
+        encodedPixelSize *= 10;
+        encodedPixelSize += c-'0';
         file.read(&c, 1);
     }while (c!='\n');
 
@@ -61,31 +70,55 @@ void load_ppm(string path)
 
 
 
-const char palette[8] = { ' ',' ', '.', ':', '*', '/', '%', '@' };
+const char palette[8] = { ' ','.', ':', ';', '/', 'X', '&', '@' };
 
 
-unsigned get_index(char* ptr)
+unsigned get_index(const char* ptr)
 {
 
     unsigned sum = (unsigned char)(ptr[0]) + (unsigned char)(ptr[1]) + (unsigned char)(ptr[2]);
 
-    return sum / 96; // 96 = 3*32
+    return sum / 96; // 96 = 3*(255/
+}
+
+
+void display_chain()
+{
+    for (unsigned long long i = 0; i< height; i+=3)
+    {
+        for (unsigned long long j = 0; j< width; j++)
+        {
+            cout << palette[get_index(chain[j + width * i])];
+        }
+        cout << endl;
+    }
+}
+
+
+void write_chain(string path)
+{
+    ofstream file(path);
+
+    for (unsigned long long i = 0; i< height; i+=3)
+    {
+        for (unsigned long long j = 0; j< width; j++)
+        {
+            file << palette[get_index(chain[j + width * i])];
+        }
+        file << '\n';
+    }
+
+    file.close();
 }
 
 
 int main()
 {
-    load_ppm("images/sign_1.ppm");
+    load_ppm("images/test.ppm");
 
 
-    for (unsigned long long i = 0; i< height * width; i++)
-    {
-        if (i%width == 0)
-            cout << endl;
-        cout << palette[get_index(chain[i])];
-
-
-    }
+    //display_chain();
+    write_chain("images/img.txt");
 
     clearChain
     return 0;
