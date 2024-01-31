@@ -17,7 +17,7 @@ void load_ppm(string path)
 
 
     //load height and width
-    file.read(magicNum, 3); // 4 = sizeof ("P16\n")
+    file.read(magicNum, 3); // 3 = sizeof ("P6\n")
 
 
 
@@ -41,9 +41,6 @@ void load_ppm(string path)
         file.read(&c, 1);
     }while (c!='\n');
 
-    cout << "height > " << height << endl;
-    cout << "width > " << width;
-
     // resize chain
     chain = new char* [height * width];
 
@@ -64,7 +61,7 @@ void load_ppm(string path)
 
 
 
-const char palette[8] = { ' ', '.', ':', '*', '/', '%', '@' };
+const char palette[8] = { ' ',' ', '.', ':', '*', '/', '%', '@' };
 
 
 unsigned get_index(char* ptr)
@@ -72,15 +69,13 @@ unsigned get_index(char* ptr)
 
     unsigned sum = (unsigned char)(ptr[0]) + (unsigned char)(ptr[1]) + (unsigned char)(ptr[2]);
 
-    return sum / 96;
+    return sum / 96; // 96 = 3*32
 }
 
 
 int main()
 {
-    load_ppm("moreboxes_2.ppm");
-
-    ofstream file("test.bin", ios::binary | ios::out);
+    load_ppm("images/sign_1.ppm");
 
 
     for (unsigned long long i = 0; i< height * width; i++)
@@ -89,11 +84,8 @@ int main()
             cout << endl;
         cout << palette[get_index(chain[i])];
 
-//file.write((char*)cursor, 1);
+
     }
-
-    file.close();
-
 
     clearChain
     return 0;
