@@ -2,11 +2,8 @@
 #include <fstream>
 #include "qoi.h"
 
-
-
-
-
 using namespace std;
+
 
 unsigned readNum(ifstream& file)
 {
@@ -74,9 +71,7 @@ const char palette[8] = { ' ','.', ':', ';', '/', 'X', '&', '@' };
 u32 getPaletteIndex(const char* ptr)
 {
     u32 sum = (u8)(ptr[0]) + (u8)(ptr[1]) + (u8)(ptr[2]);
-
-    return ((u8)ptr[3])/(255/8);
-    return (((u8)ptr[3]) * sum)/24480u ;
+    return (((u8)ptr[3]) * sum)/24576u ;
 }
 
 
@@ -117,13 +112,14 @@ int main()
     load_ppm("images/test.ppm");
 
 
-    QOI::Read("images/dice.qoi", header, chain);
+    QOI::Read("images/file.qoi", header, chain);
 
     //cout << (int)(u8)chain[17035][2] << " / " << (u64)QOI::nullColor << endl;
 
     write_chain("images/img.txt");
 
 
-    //clear2dim(chain, header.WxH) // clear chain
+    clear2Dvec(chain, header.WxH)
+
     return 0;
 }

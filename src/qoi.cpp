@@ -9,8 +9,11 @@
 
 u8 getIndex(const char* c)
 {
-    return ((u8)c[0]*3u + (u8)c[1]*5u + (u8)c[2]*7u + (u8)c[3]*11u)%64u;
+    return (((u8)c[0])*3u + ((u8)c[1])*5u + ((u8)c[2])*7u + ((u8)c[3])*11u)%64u;
 }
+
+
+
 
 void QOI::Header::Read(std::ifstream& file)
 {
@@ -56,7 +59,7 @@ void QOI::Write(const char* path, Header& header, char**& chain)
 
 void QOI::Read(const char* path, Header& header, char**& chain)
 {
-    clear2dim(chain, header.WxH); // clear chain
+    clear2Dvec(chain, header.WxH) // clear chain
 
     std::ifstream file (path, std::ios::binary | std::ios::out);
 
@@ -80,7 +83,7 @@ void QOI::Read(const char* path, Header& header, char**& chain)
             //std::cout << i << " : " <<"rgb" << std::endl;
             chain[i] = new char[4];
             file.read(chain[i], 3);
-            chain[i][3] = i!=0 ? chain[i-1][3] : (char)0xff;
+            chain[i][3] = (i!=0 ? chain[i-1][3] : (char)0xff);
 
             lookupTable[getIndex(chain[i])] = chain[i];
             continue;
@@ -103,7 +106,11 @@ void QOI::Read(const char* path, Header& header, char**& chain)
             //std::cout << i << " : " <<"run" << std::endl;
             for (u8 j = 0; j<=arg; j++) // <= because run length is stored with a bias of -1
             {
-                chain[i+j] = chain[i-1]; // copying the pointer instead of allocating more memory
+                chain[i+j] = new char[4];
+                chain[i+j][0] = chain[i-1][0];
+                chain[i+j][1] = chain[i-1][1];
+                chain[i+j][2] = chain[i-1][2];
+                chain[i+j][3] = chain[i-1][3];
                 // don't need to update the lookup table since the key is the same
             }
 
@@ -131,7 +138,12 @@ void QOI::Read(const char* path, Header& header, char**& chain)
         else if (flag == flag2bit::index)
         {
             //std::cout << i << " : " <<"index" << std::endl;
-            chain[i] = lookupTable[arg];
+            chain[i] = new char[4];
+
+            chain[i][0] = lookupTable[arg][0];
+            chain[i][1] = lookupTable[arg][1];
+            chain[i][2] = lookupTable[arg][2];
+            chain[i][3] = lookupTable[arg][3];
 
             continue;
         }
@@ -167,3 +179,7 @@ void QOI::Read(const char* path, Header& header, char**& chain)
 
     file.close();
 }
+
+
+
+
