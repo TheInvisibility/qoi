@@ -75,6 +75,7 @@ u32 getPaletteIndex(const char* ptr)
 {
     u32 sum = (u8)(ptr[0]) + (u8)(ptr[1]) + (u8)(ptr[2]);
 
+    return ((u8)ptr[3])/(255/8);
     return (((u8)ptr[3]) * sum)/24480u ;
 }
 
