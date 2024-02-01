@@ -118,7 +118,7 @@ int main()
 
 
 
-    QOI::Write("file.qoi", header, chain);
+    QOI::Write((char*)"images/file.qoi", header, chain);
 
     clearChain
     return 0;

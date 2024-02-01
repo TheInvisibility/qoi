@@ -1,26 +1,25 @@
 #include "qoi.h"
 #include <fstream>
 
-#define Wr(file, ptr, size) for(char* it = ptr+size-1; it>=ptr; it--){file.write(it, 1);}
+#define Wr(file, var) for(char* it = ((char*)&var)+sizeof(var)-1; it>=((char*)&var); it--){file.write(it, 1);}
+#define Re(file, var) for(char* it = ((char*)&var)+sizeof(var)-1; it>=((char*)&var); it--){file.read(it, 1);}
 
 void QOI::Header::Read(std::ifstream& file)
 {
-    file.read((char*)&magic, sizeof(magic));
-    file.read((char*)&width, sizeof(u32));
-    file.read((char*)&height, sizeof(u32));
-    file.read((char*)&channels, sizeof(u8));
-    file.read((char*)&colorspace, sizeof(u8));
+    Re(file, magic);
+    Re(file, width);
+    Re(file, height);
+    Re(file, channels);
+    Re(file, colorspace);
 }
-
-
 
 void QOI::Header::Write(std::ofstream& file)
 {
-    Wr(file, (char*)&magic, sizeof(magic));
-    Wr(file, (char*)&width, sizeof(width));
-    Wr(file, (char*)&height, sizeof(height));
-    Wr(file, (char*)&channels, sizeof(channels));
-    Wr(file, (char*)&colorspace, sizeof(colorspace));
+    Wr(file, magic);
+    Wr(file, width);
+    Wr(file, height);
+    Wr(file, channels);
+    Wr(file, colorspace);
 }
 
 void QOI::Write(char* path, Header& header, char** chain)
@@ -31,12 +30,11 @@ void QOI::Write(char* path, Header& header, char** chain)
 
     for (u32 i = 0u; i<header.width * header.height; i++)
     {
-        file.write(&flag8bit::rgb, 1);
-        Wr(file, chain[i], 3);
+        Wr(file, flag8bit::rgb);
+        file.write(chain[i], 3);
     }
 
-    Wr(file, (char*)&eof, sizeof(eof));
-
+    Wr(file, eof);
 
     file.close();
 }
