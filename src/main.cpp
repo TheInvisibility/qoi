@@ -2,7 +2,7 @@
 #include <fstream>
 #include "qoi.h"
 
-#define clearChain for(int i = 0; i<header.height*header.width; i++){delete[] chain[i];} delete[] chain;
+
 
 
 
@@ -29,8 +29,10 @@ QOI::Header header;
 
 
 
-void load_ppm(const string& path)
+void load_ppm(const char* path)
 {
+    //clear2dim(chain, header.WxH);
+
     // init header
     header.channels = 3u;
     header.colorspace = 0u;
@@ -49,12 +51,12 @@ void load_ppm(const string& path)
     encodedPixelSize = readNum(file);
 
     // resize chain
-    chain = new char* [header.height * header.width];
+    chain = new char* [header.WxH];
 
     // fill chain
-    for (unsigned long long index = 0; index < header.height * header.width; index++)
+    for (unsigned long long index = 0; index < header.WxH; index++)
     {
-        chain[index] = new char[3];
+        chain[index] = new char[4];
 
         file.read(chain[index], 3);
 
@@ -69,12 +71,11 @@ void load_ppm(const string& path)
 const char palette[8] = { ' ','.', ':', ';', '/', 'X', '&', '@' };
 
 
-unsigned get_index(const char* ptr)
+u32 getPaletteIndex(const char* ptr)
 {
+    u32 sum = (u8)(ptr[0]) + (u8)(ptr[1]) + (u8)(ptr[2]);
 
-    unsigned sum = (unsigned char)(ptr[0]) + (unsigned char)(ptr[1]) + (unsigned char)(ptr[2]);
-
-    return sum / 96;
+    return (((u8)ptr[3]) * sum)/24480u ;
 }
 
 
@@ -84,22 +85,23 @@ void display_chain()
     {
         for (unsigned long long j = 0; j< header.width; j++)
         {
-            cout << palette[get_index(chain[j + header.width * i])];
+            cout << palette[getPaletteIndex(chain[j + header.width * i])];
         }
         cout << endl;
     }
 }
 
 
-void write_chain(string path)
+void write_chain(const char* path)
 {
     ofstream file(path);
 
-    for (unsigned long long i = 0; i< header.height; i+=3)
+    for (u32 i = 0; i< header.height; i+=3)
     {
-        for (unsigned long long j = 0; j< header.width; j++)
+        for (u32 j = 0; j< header.width; j++)
         {
-            file << palette[get_index(chain[j + header.width * i])];
+            //cout << getPaletteIndex(chain[j + header.width * i]) << endl;
+            file << palette[getPaletteIndex(chain[j + header.width * i])];
         }
         file << '\n';
     }
@@ -110,16 +112,17 @@ void write_chain(string path)
 
 int main()
 {
+
     load_ppm("images/test.ppm");
 
 
-    //display_chain();
+    QOI::Read("images/dice.qoi", header, chain);
+
+    //cout << (int)(u8)chain[17035][2] << " / " << (u64)QOI::nullColor << endl;
+
     write_chain("images/img.txt");
 
 
-
-    QOI::Write((char*)"images/file.qoi", header, chain);
-
-    clearChain
+    //clear2dim(chain, header.WxH) // clear chain
     return 0;
 }
